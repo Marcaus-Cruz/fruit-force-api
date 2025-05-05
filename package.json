@@ -1,17 +1,18 @@
 {
   "name": "fruit-force-api",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "Serverless api for Fruit Force game",
+  "main": "src/auth/register.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "deploy": "sls deploy",
+    "offline": "sls offline start"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "aws-sdk": "^2.1692.0",
-    "bcryptjs": "^3.0.2",
+    "@aws-sdk/client-amplify": "^3.799.0",
+    "@aws-sdk/client-dynamodb": "^3.799.0",
+    "@aws-sdk/client-iam": "^3.799.0",
+    "@aws-sdk/client-s3": "^3.802.0",
+    "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
