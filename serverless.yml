@@ -1,0 +1,83 @@
+service: fruit-force-api
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-west-2
+  environment:
+    USERS_TABLE: ${self:service}-users-${opt:stage, 'dev'}
+    GAMESTATE_TABLE: ${self:service}-gamestate-${opt:stage, 'dev'}
+    JWT_SECRET: ${env:JWT_SECRET}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+          Resource:
+            - arn:aws:dynamodb:*:*:table/${self:provider.environment.USERS_TABLE}
+            - arn:aws:dynamodb:*:*:table/${self:provider.environment.GAMESTATE_TABLE}
+
+plugins:
+  - serverless-offline
+
+functions:
+  register:
+    handler: src/auth/register.handler
+    events:
+      - http:
+          path: auth/register
+          method: post
+          cors: true
+
+  login:
+    handler: src/auth/login.handler
+    events:
+      - http:
+          path: auth/login
+          method: post
+          cors: true
+
+  getGameState:
+    handler: src/game/getState.handler
+    events:
+      - http:
+          path: game
+          method: get
+          cors: true
+
+  saveGameState:
+    handler: src/game/saveState.handler
+    events:
+      - http:
+          path: game
+          method: post
+          cors: true
+
+resources:
+  Resources:
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.USERS_TABLE}
+        AttributeDefinitions:
+          - AttributeName: username
+            AttributeType: S
+        KeySchema:
+          - AttributeName: username
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+    GameStateTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.GAMESTATE_TABLE}
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
